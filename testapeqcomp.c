@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include "peqcomp.h"
 
 //Cria arquivo temporario contendo o codigo SBas e termina o programa caso falhe ao criar o arquivo
@@ -25,11 +26,22 @@ FILE* cria_temp(unsigned char* codigo)
 }
 
 //MMAP para que o codigo de maquina seja executavel
-unsigned char* mem_sbas(unsigned char* codigo)
-{
-		//Assumindo um tamanho fixo para cada arquivo temporario pra nao ter que calcular cada arquivo individualmente
-		//unsigned char* codigo = (unsigned char*)mmap(NULL);
-		return 0;
+void* cria_exec_mem(unsigned char* codigo, size_t tamanho) {
+    int pagesize = sysconf(_SC_PAGESIZE);
+    int alloc_size = ((tamanho + pagesize - 1) / pagesize) * pagesize;
+
+    // Criar mmap com permissão de escrita e execução
+    void* mem = mmap(NULL, alloc_size, PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+    if(mem == MAP_FAILED)
+	{
+        perror("mmap");
+        exit(1);
+    }
+
+    // Copia o código para a memória alocada
+    memcpy(mem, codigo, tamanho);
+    return mem;
 }
 
 int main()
@@ -46,5 +58,11 @@ int main()
 	}
 	printf("\n");
 	printf("tamanho do codigo:%d\n", sizeof(codigo));
+
+	//executa o codigo
+	funcp f = (funcp)codigo;
+	int i = (int)(*f);
+
+	printf("resultado do codigo:%d\n", i);
 	return 0;
 }
