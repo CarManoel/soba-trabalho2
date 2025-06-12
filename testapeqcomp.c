@@ -30,16 +30,16 @@ void* cria_exec_mem(unsigned char* codigo, size_t tamanho) {
     int pagesize = sysconf(_SC_PAGESIZE);
     int alloc_size = ((tamanho + pagesize - 1) / pagesize) * pagesize;
 
-    // Criar mmap com permissão de escrita e execução
+    // Criar mmap com permissão de escrita e execucao
     void* mem = mmap(NULL, alloc_size, PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     if(mem == MAP_FAILED)
     {
-        perror("mmap");
+        printf("Falha ao criar mapa de memoria executavel");
         exit(1);
     }
 
-    // Copia o código para a memória alocada
+    //Copia o codigo para a memória alocada
     memcpy(mem, codigo, tamanho);
     return mem;
 }
@@ -59,7 +59,7 @@ int main()
 	printf("\n");
 	printf("tamanho do codigo:%d\n", sizeof(codigo));
 
-	//executa o codigo
+	//Executa o codigo
 	funcp f = (funcp)codigo;
 	int i = (int)(*f); //errado
 
