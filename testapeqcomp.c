@@ -34,7 +34,7 @@ void* cria_exec_mem(unsigned char* codigo, size_t tamanho) {
     void* mem = mmap(NULL, alloc_size, PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     if(mem == MAP_FAILED)
-	{
+    {
         perror("mmap");
         exit(1);
     }
@@ -61,7 +61,7 @@ int main()
 
 	//executa o codigo
 	funcp f = (funcp)codigo;
-	int i = (int)(*f);
+	int i = (int)(*f); //errado
 
 	printf("resultado do codigo:%d\n", i);
 	return 0;
